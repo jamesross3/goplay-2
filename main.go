@@ -1,30 +1,15 @@
 package main
 
 import (
-	"io"
-	"net/http"
-	"net/http/httptest"
-	"os"
+	"context"
 )
 
+type debugstr string
+
 func main() {
-	srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		rw.Write([]byte("Hello world!\n"))
-	}))
-	defer srv.Close()
-
-	req, err := http.NewRequest("GET", srv.URL, nil)
-	if err != nil {
-		panic(err)
-	}
-	req.Context().Done()
-
-	resp, err := srv.Client().Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-	if _, err := io.Copy(os.Stdout, resp.Body); err != nil {
-		panic(err)
-	}
+	ctx, cancel := context.WithCancel(context.Background())
+	ctx1 := context.WithValue(ctx, debugstr("debug"), "please")
+	ctx2, _ := context.WithCancel(ctx1)
+	cancel()
+	<-ctx2.Done()
 }
