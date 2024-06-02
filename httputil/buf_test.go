@@ -1,9 +1,6 @@
 package httputil
 
 import (
-	"bufio"
-	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -14,68 +11,45 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestBuf(t *testing.T) {
-	fmt.Printf("Hello\n")
+func runBenchmark(b *testing.B, wrapper ResponseWriterWrapper) {
 	testFS := &myFS{rootDir: "testdata"}
 	fserve := http.FileServer(testFS)
 
-	bufSizer := new(mysizer)
+	time.Sleep(100 * time.Millisecond)
 	go http.ListenAndServe("localhost:8080", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		bufioWriter := bufio.NewWriterSize(w, bufSizer.size())
-		defer bufioWriter.Flush()
-		wrapped := &wrappedResponseWriter{
-			ResponseWriter: w,
-			writer:         bufioWriter,
-		}
-		fserve.ServeHTTP(wrapped, r)
+		wrappedResponseWriter := wrapper.Wrap(w)
+		defer wrappedResponseWriter.Done()
+		fserve.ServeHTTP(wrappedResponseWriter, r)
 	}))
-	time.Sleep(time.Second)
-	numReqs := 100
-	type Result struct {
-		BufSize             int
-		BytesPerMicrosecond int64
+
+	time.Sleep(100 * time.Millisecond)
+	b.ResetTimer()
+
+	var totalSize int64
+	for i := 0; i < b.N; i++ {
+		size, _ := doReq(b)
+		totalSize += size
 	}
-	var results []Result
-	for i := 0; i < 11; i++ {
-		bufSize := 4096 << i
-		*bufSizer = mysizer(bufSize)
-		var totalSize int64
-		var totalTime time.Duration
-		for i := 0; i < numReqs; i++ {
-			size, duration := doReq(t)
-			totalSize += size
-			totalTime += duration
-		}
-		results = append(results, Result{
-			BufSize:             bufSize,
-			BytesPerMicrosecond: totalSize / totalTime.Microseconds(),
-		})
-		time.Sleep(time.Second)
+	b.ReportAllocs()
+	b.SetBytes(totalSize)
+}
+
+func BenchmarkBaseline(b *testing.B) {
+	runBenchmark(b, identityResponseWriterWrapper{})
+}
+
+func BenchmarkBufio0(b *testing.B) {
+	runBenchmark(b, NewResponseWriterWrapperWithBufio(4096))
+}
+
+type identityResponseWriterWrapper struct{}
+
+func (i identityResponseWriterWrapper) Wrap(rw http.ResponseWriter) WrappedResponseWriter {
+	return withDoner{
+		ResponseWriter: rw,
+		donerFn:        func() error { return nil },
 	}
-	asJSON, err := json.MarshalIndent(results, "", "  ")
-	require.NoError(t, err)
-	t.Logf("\n\n%s\n\n", string(asJSON))
 }
-
-type mysizer int
-
-func (m *mysizer) size() int {
-	return int(*m)
-}
-
-type wrappedResponseWriter struct {
-	http.ResponseWriter
-	writer io.Writer
-}
-
-func (w *wrappedResponseWriter) Write(in []byte) (int, error) {
-	return w.writer.Write(in)
-}
-
-// no bufio: 3404 bytes/microsecond
-// bufio 4096 (golang http default): Avg throughput: 3408 bytes/microsecond (https://stackoverflow.com/questions/26033853/will-http-responsewriters-write-function-buffer-in-go)
-// bufio 4096*2: 3288 bytes/microsecond
-// bufio 4096*4: 3403 bytes/microsecond
 
 func doReq(t testing.TB) (size int64, duration time.Duration) {
 	resp, err := http.Get("http://localhost:8080/30MB.txt")

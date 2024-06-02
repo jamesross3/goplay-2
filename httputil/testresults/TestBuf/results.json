@@ -1,0 +1,46 @@
+[
+  {
+    "WriterBufSize": 4096,
+    "BytesPerMicrosecond": 4689
+  },
+  {
+    "WriterBufSize": 8192,
+    "BytesPerMicrosecond": 4712
+  },
+  {
+    "WriterBufSize": 16384,
+    "BytesPerMicrosecond": 4760
+  },
+  {
+    "WriterBufSize": 32768,
+    "BytesPerMicrosecond": 4314
+  },
+  {
+    "WriterBufSize": 65536,
+    "BytesPerMicrosecond": 4531
+  },
+  {
+    "WriterBufSize": 131072,
+    "BytesPerMicrosecond": 5152
+  },
+  {
+    "WriterBufSize": 262144,
+    "BytesPerMicrosecond": 5371
+  },
+  {
+    "WriterBufSize": 524288,
+    "BytesPerMicrosecond": 5662
+  },
+  {
+    "WriterBufSize": 1048576,
+    "BytesPerMicrosecond": 5698
+  },
+  {
+    "WriterBufSize": 2097152,
+    "BytesPerMicrosecond": 5242
+  },
+  {
+    "WriterBufSize": 4194304,
+    "BytesPerMicrosecond": 4851
+  }
+]
