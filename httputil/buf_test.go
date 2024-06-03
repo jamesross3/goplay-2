@@ -162,3 +162,11 @@ func BenchmarkBufioPool9(b *testing.B) { // 199           5252033 ns/op        5
 func BenchmarkBufioPool10(b *testing.B) {
 	runBenchmark(b, NewResponseWriterWrapperWithBufioWriterPool(NewBufferedWriterPool(4096<<10)))
 }
+
+func BenchmarkBufioPool11(b *testing.B) {
+	runBenchmark(b, NewResponseWriterWrapperWithBufioWriterPool(NewBufferedWriterPool(4096<<11)))
+}
+
+func BenchmarkBufioPool12(b *testing.B) {
+	runBenchmark(b, NewResponseWriterWrapperWithBufioWriterPool(NewBufferedWriterPool(4096<<12)))
+}
