@@ -1,6 +1,7 @@
 package httputil
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"os"
@@ -8,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jamesross3/goplay2/resources"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -157,6 +160,7 @@ func BenchmarkBufioPool8(b *testing.B) {
 
 func BenchmarkBufioPool9(b *testing.B) { // 199           5252033 ns/op        5973.06 MB/s       76431 B/op         83 alloc
 	runBenchmark(b, NewResponseWriterWrapperWithBufioWriterPool(NewBufferedWriterPool(4096<<9)))
+	_ = resources.Blocks(context.TODO())
 }
 
 func BenchmarkBufioPool10(b *testing.B) {
@@ -169,4 +173,10 @@ func BenchmarkBufioPool11(b *testing.B) {
 
 func BenchmarkBufioPool12(b *testing.B) {
 	runBenchmark(b, NewResponseWriterWrapperWithBufioWriterPool(NewBufferedWriterPool(4096<<12)))
+}
+
+func TestLen(t *testing.T) {
+	str := "hello world!éº0˚∂∂∂∂∂∂∂"
+	b := []byte(str)
+	assert.Equal(t, len(str), len(b))
 }
