@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jamesross3/goplay2/resources"
+	"github.com/jamesross3/go-play2/resources"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

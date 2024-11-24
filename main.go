@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/jamesross3/goplay2/httputil"
+	"github.com/jamesross3/go-play2/httputil"
 	_ "github.com/palantir/witchcraft-go-server/v2/witchcraft"
 	_ "github.com/palantir/witchcraft-go-server/v2/wrouter"
 )

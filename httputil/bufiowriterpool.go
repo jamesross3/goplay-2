@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"io"
 
-	"github.com/jamesross3/goplay2/genericsync"
+	"github.com/jamesross3/go-play2/genericsync"
 )
 
 type BufioWriterPool interface {

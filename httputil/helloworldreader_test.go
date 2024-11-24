@@ -3,7 +3,7 @@ package httputil_test
 import (
 	"testing"
 
-	"github.com/jamesross3/goplay2/httputil"
+	"github.com/jamesross3/go-play2/httputil"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -1,4 +1,4 @@
-module github.com/jamesross3/goplay2
+module github.com/jamesross3/go-play2
 
 go 1.22.0
 
